@@ -207,6 +207,8 @@ class DoublyLinkedList {
   }
 }
 
+// 리버스 만들어야 함
+
 let link = new DoublyLinkedList();
 
 link.append(0);
