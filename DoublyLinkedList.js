@@ -1,4 +1,3 @@
-// ### 🔑 **핵심 정리:**
 class Node {
   constructor(value) {
     this.value = value;
