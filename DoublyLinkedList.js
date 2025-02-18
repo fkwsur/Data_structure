@@ -1,27 +1,31 @@
+// ### 🔑 **핵심 정리:**
 class Node {
   constructor(value) {
     this.value = value;
     this.next = null;
+    this.prev = null;
   }
 }
 
-class LinkedList {
+class DoublyLinkedList {
   constructor() {
     this.head = null;
     this.tail = null;
     this.length = 0;
   }
 
-  append(val) {
-    const newno = new Node(val);
-    if (this.length == 0) {
-      this.head = newno;
-      this.tail = newno;
+  append(value) {
+    const newNode = new Node(value);
+    if (this.length === 0) {
+      this.head = newNode;
+      this.tail = newNode;
     } else {
-      this.tail.next = newno; //tail node1 <_ node  node1 next -> node2
-      this.tail = newno;
+      this.tail.next = newNode;
+      newNode.prev = this.tail;
+      this.tail = newNode;
     }
     this.length++;
+    return true;
   }
 
   printList() {
@@ -31,7 +35,7 @@ class LinkedList {
     }
     let temp = this.head;
     while (temp != null) {
-      //   console.log(temp)
+      console.log(temp)
       temp = temp.next;
     }
   }
@@ -40,23 +44,19 @@ class LinkedList {
 
   pop() {
     let temp = this.head;
-    if (this.length == 1) {
+    if (this.length == 0) {
+      console.log("함수를 실행할 node가 없습니다.");
+      return null;
+    } else if (this.length == 1) {
       this.head = null;
       this.tail = null;
       this.length = 0;
       return temp;
-    } else if (this.length == 0) {
-      console.log("함수를 실행할 node가 없습니다.");
-      return null;
     } else {
-      while (temp.next.next != null) {
-        temp = temp.next;
-      }
-      let deleted_node = temp.next;
-      temp.next = null;
-      this.tail = temp;
-      this.length = this.length - 1;
-      return deleted_node.value;
+      this.tail = this.tail.prev;
+      this.tail.next = null;
+      this.length--;
+      return this.tail;
     }
   }
 
@@ -73,6 +73,7 @@ class LinkedList {
     } else {
       let deleted_node = temp;
       this.head = this.head.next;
+      this.head.prev = null;
       this.length = this.length - 1;
       return deleted_node.value;
     }
@@ -80,16 +81,16 @@ class LinkedList {
 
   get(index) {
     let temp = this.head;
-    if (this.length == 0) {
+    if (this.length == 1) {
+      return temp;
+    } else if (this.length == 0) {
       console.log("함수를 실행할 node가 없습니다.");
       return null;
-    }else if (this.length == 1) {
-      return temp;
     } else {
       let i = 0;
       while (i < index) {
         if (temp.next == null) {
-          return "no index";
+          return null;
         }
         temp = temp.next;
         i++;
@@ -109,7 +110,7 @@ class LinkedList {
       let i = 0;
       while (i < index) {
         if (temp.next == null) {
-          return "no index";
+          return false;
         }
         temp = temp.next;
         i++;
@@ -123,7 +124,7 @@ class LinkedList {
     let temp = this.head;
     if (this.head == null && index > 0) {
       console.log(`0번 인덱스가 비어있습니다. 0번부터 채워주세요`);
-      return;
+      return false;
     }
     if (index > this.length) {
       console.log(
@@ -145,13 +146,17 @@ class LinkedList {
       if (index == this.length && temp.next == null) {
         // 인덱스가 마지막일 때
         temp.next = newno;
+        newno.prev = this.tail;
         this.tail = newno;
         break;
       } else if (i == index - 1) {
         // 인덱스가 중간일 떄
-        nextset = temp.next;
-        temp.next = newno;
-        newno.next = nextset;
+        console.log(temp)
+        nextset = temp.next; 
+        temp.next = newno; 
+        newno.prev = temp;
+        newno.next = nextset; 
+        if (nextset) nextset.prev = newno;
         break;
       }
       temp = temp.next;
@@ -169,12 +174,19 @@ class LinkedList {
       this.length = 0;
       return;
     }
-    if (this.head == null || index < 0 || index >= this.length) {
+    if (!this.head || index < 0 || index >= this.length) {
       console.log(`인덱스가 비어있거나 유효하지 않습니다.`);
-      return;
+      return false;
     }
     if (index === 0) {
       this.head = temp.next; // 첫 번째 노드를 삭제
+      this.head.prev = null;
+      this.length--;
+      return true;
+    }
+    if (index === this.length - 1) {
+      this.tail = this.tail.prev;
+      this.tail.next = null;
       this.length--;
       return true;
     }
@@ -186,6 +198,7 @@ class LinkedList {
       }
       if (i == index) {
         before.next = temp.next;
+        temp.next.prev = before;
         this.length--;
         return true;
       }
@@ -193,64 +206,12 @@ class LinkedList {
       i++;
     }
   }
-
-  // 참조변경으로 뒤집는 방식으로 업데이트 해야함
-  reverse() {
-    let temp = this.head;
-    if (this.head == null) {
-      console.log(`인덱스가 비어있거나 유효하지 않습니다.`);
-      return;
-    }
-    let i = 0;
-    let last;
-    let before;
-    while (i < this.length) {
-      if (i == 0) {
-        last = new Node(temp.value);
-        this.tail = temp
-      }
-      if (i > 0) {
-        before = new Node(temp.value);
-        before.next = last;
-        last = before;
-      }
-      temp = temp.next;
-      i++;
-    }
-    this.tail.next = null
-    this.head = before;
-    return true;
-  }
 }
 
-let link = new LinkedList();
+let link = new DoublyLinkedList();
 
 link.append(0);
-// link.append(1);
-// link.append(2);
-// link.append(3);
-// link.append(4);
+link.append(1);
+link.append(2);
 
-link.pop()
-console.log(link)
-// link.popfirst()
-// link.get(3)
-// link.set(4, 100)
-// link.insert(1, 5000);
-// link.remove(4)
-// link.reverse()
-
-// console.log(link);
-// console.log(link.head);
-// console.log(link.head.next);
-// console.log(link.head.next.next);
-// console.log(link.head.next.next.next);
-// console.log(link.head.next.next.next.next);
-// // console.log(link.head.next.next.next.next.next);
-
-// 복제와 참조
-// let a = [1, 2, 3];
-// let b;
-// b = a;
-// b.splice(1, 1); // 인덱스 1의 요소 삭제 (즉, 2를 삭제)
-// console.log(a);
+console.log(link);
